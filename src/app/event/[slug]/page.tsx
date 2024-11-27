@@ -1,17 +1,25 @@
 import H1 from "@/components/h1";
+import { capitalize, getEvent } from "@/lib/utils";
+import { Metadata } from "next";
 import Image from "next/image";
 
-type EventPageProps = {
+type Props = {
   params: {
     slug: string;
   };
 };
-export default async function EventPage({ params }: EventPageProps) {
-  const city = params.slug;
-  const response = await fetch(
-    `https://bytegrad.com/course-assets/projects/evento/api/events/${city}`
-  );
-  const event = await response.json();
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const slug = params.slug;
+  const event = await getEvent(slug);
+  return {
+    title: event.name,
+  };
+}
+export default async function EventPage({ params }: Props) {
+  const slug = params.slug;
+
+  const event = await getEvent(slug);
 
   return (
     <main>
@@ -66,15 +74,11 @@ export default async function EventPage({ params }: EventPageProps) {
       <div className="text-center min-h-[75vh] px-5 py-16 ">
         <Section>
           <SectionHeading>About this event</SectionHeading>
-          <SectionContent>
-            {event.description}
-          </SectionContent>
+          <SectionContent>{event.description}</SectionContent>
         </Section>
         <Section>
           <SectionHeading>Location</SectionHeading>
-          <SectionContent>
-            {event.location}
-          </SectionContent>
+          <SectionContent>{event.location}</SectionContent>
         </Section>
       </div>
     </main>
