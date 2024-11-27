@@ -10,7 +10,7 @@ type EventsPageProps = {
 export default async function EventsPage({ params }: EventsPageProps) {
   const city = params.city;
 
-  const res = await fetch("https://bytegrad.com/course-assets/projects/evento/api/events");
+  const res = await fetch(`https://bytegrad.com/course-assets/projects/evento/api/events?city=${city}`);
   const events:EventoEvent[] = await res.json();
   console.log(events);
   
