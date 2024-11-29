@@ -1,6 +1,5 @@
 import H1 from "@/components/h1";
 import { getEvent } from "@/lib/server-utils";
-
 import { Metadata } from "next";
 import Image from "next/image";
 
@@ -13,28 +12,42 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = params.slug;
   const event = await getEvent(slug);
+
   return {
     title: event.name,
   };
 }
+
+export async function generateStaticParams() {
+  // top 100 most popular events
+  return [
+    {
+      slug: "comedy-extravaganza",
+    },
+    {
+      slug: "dj-practice-session",
+    },
+  ];
+}
+
 export default async function EventPage({ params }: Props) {
   const slug = params.slug;
-
   const event = await getEvent(slug);
 
   return (
     <main>
-      <section className="relative overflow-hidden flex justify-center items-center  py-14 md:py-20 ">
+      <section className="relative overflow-hidden flex justify-center items-center py-14 md:py-20">
         <Image
-          className="object-cover blur-3xl z-0 overflow-hidden"
           src={event.imageUrl}
-          alt={event.name}
+          className="object-cover z-0 blur-3xl"
+          alt="Event background image"
           fill
           quality={50}
+          sizes="(max-width: 1280px) 100vw, 1280px"
           priority
-          sizes="(max-width:1280px) 100vw, 1280px"
         />
-        <div className="z-1 flex flex-col lg:flex-row  gap-6 lg:gap-x-16  relative">
+
+        <div className="z-1 flex flex-col gap-6 lg:gap-16 lg:flex-row relative">
           <Image
             src={event.imageUrl}
             alt={event.name}
@@ -43,8 +56,8 @@ export default async function EventPage({ params }: Props) {
             className="rounded-xl border-2 border-white/50 object-cover"
           />
 
-          <div className="flex flex-col ">
-            <p className=" text-white/70">
+          <div className="flex flex-col">
+            <p className="text-white/75">
               {new Date(event.date).toLocaleDateString("en-US", {
                 weekday: "long",
                 month: "long",
@@ -56,27 +69,23 @@ export default async function EventPage({ params }: Props) {
               {event.name}
             </H1>
 
-            <p className="text-white/75 whitespace-nowrap text-xl ">
-              Oraganized by
-              <span className="italic">{event.organizerName}</span>
+            <p className="whitespace-nowrap text-xl text-white/75">
+              Organized by <span className="italic">{event.organizerName}</span>
             </p>
 
-            <button
-              className="bg-white/20 text-lg capitalize bg-blur
-             mt-5 lg:mt-auto w-[95%] sm:w-full
-             state-effects
-             rounded-md border-2 py-2"
-            >
-              Get Tickets
+            <button className="bg-white/20 text-lg capitalize bg-blur mt-5 lg:mt-auto w-[95vw] rounded-md border-white/10 border-2 sm:w-full py-2 state-effects">
+              Get tickets
             </button>
           </div>
         </div>
       </section>
-      <div className="text-center min-h-[75vh] px-5 py-16 ">
+
+      <div className="min-h-[75vh] text-center px-5 py-16">
         <Section>
           <SectionHeading>About this event</SectionHeading>
           <SectionContent>{event.description}</SectionContent>
         </Section>
+
         <Section>
           <SectionHeading>Location</SectionHeading>
           <SectionContent>{event.location}</SectionContent>
@@ -89,9 +98,11 @@ export default async function EventPage({ params }: Props) {
 function Section({ children }: { children: React.ReactNode }) {
   return <section className="mb-12">{children}</section>;
 }
+
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return <h2 className="text-2xl mb-8">{children}</h2>;
 }
+
 function SectionContent({ children }: { children: React.ReactNode }) {
   return (
     <p className="max-w-4xl mx-auto text-lg leading-8 text-white/75">
